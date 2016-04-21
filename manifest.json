@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "You're Not My Friend",
+  "description": "Rejects LinkedIn friend requests from recruiters",
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.linkedin.com/*"],
+      "js": ["zepto.js", "background.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "version": "1.0",
+  "page_action": {
+    "default_icon": "icon.png"
+  }
+}
