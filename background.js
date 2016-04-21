@@ -20,6 +20,7 @@ var _youreNotMyFriend = (function() {
 
 		return {
 			getAddConnectionsButton: function() {return _getElement('connections-button', '.activity-tab[data-li-activity-type="addconnections"]', true)},
+			getActivityDropdown: function() {return _getElement('activity-container', '.activity-container .activity-drop', true)},
 			getPeopleList: function() {return _getElement('people-list', '.activity-container #connection-tab-top-container .connection-tab-people-list li')},
 			getInvitationCount: function() {return _getElement('inv-count', '#header-invitations-count')}
 		};
@@ -48,20 +49,23 @@ var _youreNotMyFriend = (function() {
 				//wait for the dropdown data to load
 				var interval = setInterval(function() {
 					//if the data exists
-					if (ui.getPeopleList().length) {
+					if (ui.getActivityDropdown().last().hasClass('activity-drop-loading') == false) {
 						clearInterval(interval);
 
 						var invites = $(ui.getInvitationCount()).attr('data-gem-pending-invites');
 						//and we have pending invites
 						if (invites) {
 							//check each invitation's title for the word recruiter
+							var peopleListLength = ui.getPeopleList().length;
+							var completedCount = 0;
+
 							$(ui.getPeopleList()).each(function(key, val) {
 								var self = this;
 								var name = $(this).find('.item-primary-headline a').text();
 								var title = $(this).find('.item-secondary-headline').text();
 								var fullName = name+' ('+title+')';
 
-								if (title.toLowerCase().indexOf('recruiter') > -1) {
+								if (title.toLowerCase().indexOf('recruiter') > -1 && !$(this).find('.ignore-confirmation').length) {
 									//if it's there, click ignore
 									log(fullName+' is not my friend');
 									$(this).find('.connection-item-action[data-li-trk-code="nav_utilities_invites_ignore"]').click();
@@ -79,12 +83,13 @@ var _youreNotMyFriend = (function() {
 
 											//click 'I don't know this person'
 											$(self).find('.ignore-confirmation a[data-action="invitationDecline"]').click();
-											active = false;
+											clearInterval(interval);
+											if (++completedCount >= peopleListLength-1) active = false;
 										} else if (++count * intervalInterval*1000 >= timeout*1000) {
 											//if the data fails to load, do nothing
 											log(fullName+' ignore request timed out, yo');
 											clearInterval(interval);
-											active = false;
+											if (++completedCount >= peopleListLength-1) active = false;
 										}
 									}, intervalInterval*1000)
 								} else {
@@ -92,6 +97,10 @@ var _youreNotMyFriend = (function() {
 									log(name+'('+title+') might be my friend');
 								}
 							})
+						} else {
+							log('No pending invites');
+							clearInterval(interval);
+							active = false;
 						}
 					} else if (++count * intervalInterval*1000 >= timeout*1000) {
 						//if the data fails to load, do nothing
