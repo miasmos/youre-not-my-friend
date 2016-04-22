@@ -1,5 +1,30 @@
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-76738709-1', 'auto');
+ga('set', 'checkProtocolTask', function(){}); // Removes failing protocol check. @see: http://stackoverflow.com/a/22152353/1958200
+ga('require', 'displayfeatures');
+ga('send', 'pageview', '/background.html');
+
 var _youreNotMyFriend = (function() {
 	var debug = !('update_url' in chrome.runtime.getManifest());	//checks whether the runtime was downloaded from the store or not
+
+	var track = (function() {
+		function _send(c,a,l) {
+			if (!(c && a)) return;
+			if (typeof l !== 'undefined') {
+				ga('send', 'event', c, a, l);
+			} else {
+				ga('send', 'event', c, a);
+			}
+		}
+
+		return {
+			ignoredUser: function(name,title) {return _send('LinkedIn', 'Ignored User', name+"|"+title)}
+		}
+	})();
 
 	var ui = (function() {
 		//caches zepto elements
@@ -19,7 +44,7 @@ var _youreNotMyFriend = (function() {
 		}
 
 		return {
-			getAddConnectionsButton: function() {return _getElement('connections-button', '.activity-tab[data-li-activity-type="addconnections"]', true)},
+			getAddConnectionsButton: function() {return _getElement('connections-button', '.activity-tab[data-li-activity-type="addconnections"] #dropdowntest', true)},
 			getActivityDropdown: function() {return _getElement('activity-container', '.activity-container .activity-drop', true)},
 			getPeopleList: function() {return _getElement('people-list', '.activity-container #connection-tab-top-container .connection-tab-people-list li')},
 			getInvitationCount: function() {return _getElement('inv-count', '#header-invitations-count')}
@@ -77,6 +102,7 @@ var _youreNotMyFriend = (function() {
 										if ($(self).find('.ignore-confirmation').length) {
 											//we've successfully ignored a recruiter
 											log('Ignored '+fullName);
+											track.ignoredUser(name,title)
 
 											//click 'report as spam'
 											// $(self).find('.ignore-confirmation a[data-action="invitationReportAbuse"]').click();

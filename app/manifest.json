@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "You're Not My Friend",
   "description": "Rejects LinkedIn friend requests from recruiters.",
-
+  "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
   "content_scripts": [
     {
       "matches": ["*://*.linkedin.com/*"],
