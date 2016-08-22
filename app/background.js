@@ -90,7 +90,7 @@ var _youreNotMyFriend = (function() {
 								var title = $(this).find('.item-secondary-headline').text();
 								var fullName = name+' ('+title+')';
 
-								if (title.toLowerCase().indexOf('recruiter') > -1 && !$(this).find('.ignore-confirmation').length) {
+								if ((title.toLowerCase().indexOf('recruiter') > -1 || title.toLowerCase().indexOf('recruitment') > -1) && !$(this).find('.ignore-confirmation').length) {
 									//if it's there, click ignore
 									log(fullName+' is not my friend');
 									$(this).find('.connection-item-action[data-li-trk-code="nav_utilities_invites_ignore"]').click();
